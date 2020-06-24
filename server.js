@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 
-const server = require("http").Server(app);
+const server = require("http").createServer(app);
 const io = require("socket.io")(server);
 const net = require('net');
 const Data = require('./models/Data.js');
@@ -15,6 +15,11 @@ app.use(express.json());
 
 app.use(express.static('public'));
 
+// add routes
+app.get('/', (req, res) => {
+    return res.send(navbarPage + dashboardPage);
+});
+
 
 // setup objection and knex
 const { Model } = require('objection');
@@ -25,7 +30,13 @@ const knex = Knex(knexFile.development);
 
 Model.knex(knex);
 
-/*
+// socket.io
+io.on('connection', socket => {
+    socket.on('temperature', value => {
+        io.emit('temperature', value)
+    });
+});
+
 // get incoming data, store it in db and send it to the browser
 const netServer = net.createServer((socket) => {
     console.log('client connected');
@@ -35,21 +46,18 @@ const netServer = net.createServer((socket) => {
             // store data in db before sending to browser
             Data.query().insert({ temperature }).then(data => {
                 console.log('Storing data...' + temperature);
+                console.log('sending data to browser...' + temperature);
+                io.emit('temperature', temperature);
             })
         } catch (error) {
             console.error("Error inserting data.");
         }  
     });
-});*/
-
-// socket.io
-io.on('connection', socket => {
-    socket.on('temperature', value => {
-        io.emit('temperature', value)
-    });
 });
 
 
+
+/*
 let id = 0;
 // fetch data from db and send it to the browser to be rendered
 setInterval(() => {
@@ -64,27 +72,22 @@ setInterval(() => {
             console.log('error sending data to browser');
         }
     }
-}, 1000); 
+}, 1000); */
 
 // session
 
-// add routes
-app.get('/', (req, res) => {
-    return res.send(navbarPage + dashboardPage);
-});
 
-/*
 // server is listening for incoming connection from a sensor
 const SENSOR_PORT = 8124;
 netServer.listen(SENSOR_PORT, 'localhost', () => {
     console.log('waiting for client...');
-});*/
+});
+
 
 // start webserver
-const PORT = 3000;
-app.listen(PORT, (error) => {
+server.listen(3000, (error) => {
     if (error) {
-        console.log(error);
+        console.log("Error running the server");
     }
-    console.log('Server is running on port', PORT);
-});
+    console.log("The server is running on port", 3000);
+  });

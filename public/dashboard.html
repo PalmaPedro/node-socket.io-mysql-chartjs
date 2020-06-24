@@ -1,15 +1,16 @@
 <!--<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>socket.io-chartjs</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
 </head>
 <body>
+    
+</body>
 -->
 <h1>Temperature</h1>
 <canvas id="chart" width="600" height="400"></canvas>
-
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.0/Chart.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js"></script>
@@ -18,33 +19,34 @@
 <script>
   const socket = io.connect();
   const ctx = document.getElementById('chart').getContext('2d')
-  const data = {
-    labels: [0],
-    datasets: [{
-      data: [0],
-      fill: false,
-      label: 'Temperature',
-      backgroundColor: '#f54e42'
-    }]
-  }
-  const optionsAnimations = { animation: false }
-  const chart = new Chart(ctx, {
-    type: 'line',
-    data: data,
-    options: optionsAnimations
-  })
-
-  socket.on('temperature', value => {
-    const length = data.labels.length
-    if (length >= 50) {
-      data.datasets[0].data.shift()
-      data.labels.shift()
+    const data = {
+      labels: [0],
+      datasets: [{
+        data: [0],
+        fill: false,
+        label: 'Temperature',
+        backgroundColor: '#f54e42'
+      }]
     }
-    data.labels.push(moment().format('HH:mm:ss'))
-    data.datasets[0].data.push(value)
+    const optionsAnimations = { animation: false }
+    const chart = new Chart(ctx, {
+      type: 'line',
+      data: data,
+      options: optionsAnimations
+    })
 
-    chart.update()
-  })
-</script>
+    socket.on('temperature', value => {
+      const length = data.labels.length
+      if (length >= 50) {
+        data.datasets[0].data.shift()
+        data.labels.shift()
+      }
+      data.labels.push(moment().format('HH:mm:ss'))
+      data.datasets[0].data.push(value)
+
+      chart.update()
+    })
+  </script>
 </body>
+
 </html>
