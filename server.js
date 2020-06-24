@@ -79,7 +79,7 @@ setInterval(() => {
 
 // server is listening for incoming connection from a sensor
 const SENSOR_PORT = 8124;
-netServer.listen(SENSOR_PORT, 'localhost', () => {
+netServer.listen(SENSOR_PORT, '18.197.191.129', () => {
     console.log('waiting for client...');
 });
 

@@ -1,7 +1,7 @@
 const net = require('net');
 
 const client = new net.Socket();
-client.connect(8124,'localhost', () => {
+client.connect(8124,'18.197.191.129', () => {
     console.log('client connecting...');
     //client.write('Hello, server! from client');
 });
