@@ -7,10 +7,14 @@ const net = require('net');
 const Data = require('./models/Data.js');
 
 const fs = require('fs');
+const navbarPage = fs.readFileSync("./public/navbar.html", "utf8");
 const dashboardPage = fs.readFileSync("./public/dashboard.html", "utf8");
 
-app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
+
+app.use(express.static('public'));
+
 
 // setup objection and knex
 const { Model } = require('objection');
@@ -21,6 +25,7 @@ const knex = Knex(knexFile.development);
 
 Model.knex(knex);
 
+/*
 // get incoming data, store it in db and send it to the browser
 const netServer = net.createServer((socket) => {
     console.log('client connected');
@@ -35,7 +40,7 @@ const netServer = net.createServer((socket) => {
             console.error("Error inserting data.");
         }  
     });
-});
+});*/
 
 // socket.io
 io.on('connection', socket => {
@@ -44,7 +49,7 @@ io.on('connection', socket => {
     });
 });
 
-/*
+
 let id = 0;
 // fetch data from db and send it to the browser to be rendered
 setInterval(() => {
@@ -59,20 +64,21 @@ setInterval(() => {
             console.log('error sending data to browser');
         }
     }
-}, 1000); */
+}, 1000); 
 
 // session
 
 // add routes
 app.get('/', (req, res) => {
-    return res.send(dashboardPage);
+    return res.send(navbarPage + dashboardPage);
 });
 
+/*
 // server is listening for incoming connection from a sensor
 const SENSOR_PORT = 8124;
 netServer.listen(SENSOR_PORT, 'localhost', () => {
     console.log('waiting for client...');
-});
+});*/
 
 // start webserver
 const PORT = 3000;

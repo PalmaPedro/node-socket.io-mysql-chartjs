@@ -1,4 +1,4 @@
-const credentials = require("./config/mysql.Credentials");
+const credentials = require("./config/mysqlCredentials");
 
 const { knexSnakeCaseMappers } = require('objection');
 
