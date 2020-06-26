@@ -4,7 +4,7 @@ const app = express();
 const server = require("http").createServer(app);
 const io = require("socket.io")(server);
 const net = require('net');
-const Data = require('./models/Data.js');
+const shortid = require('shortid');
 
 const fs = require('fs');
 const navbarPage = fs.readFileSync("./public/navbar.html", "utf8");
@@ -25,6 +25,8 @@ app.get('/', (req, res) => {
 const { Model } = require('objection');
 const Knex = require('knex');
 const knexFile = require('./knexfile.js');
+const Data = require('./models/Data.js');
+const Sensor = require('./models/Sensor.js');
 
 const knex = Knex(knexFile.development);
 
@@ -39,7 +41,17 @@ io.on('connection', socket => {
 
 // get incoming data, store it in db and send it to the browser
 const netServer = net.createServer((socket) => {
-    console.log('client connected');
+    // generate socket id and store it in db
+    socket.id = shortid.generate();
+    serial_no = socket.id;
+    try {
+        Sensor.query().insert({ serial_no }).then(serial_no => {
+            console.log(`client connected [id=${serial_no}]`);
+        })
+    } catch (error) {
+        console.log('error inserting data');
+    }
+    // get temperature data
     socket.on('data', (incomingJSONData) => {
         temperature = JSON.parse(incomingJSONData);
         try {

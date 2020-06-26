@@ -16,8 +16,8 @@ client.on('close', () => {
 
 // send data from sensor to server
 setInterval(() => {
-    const data = Math.round(Math.random() * 10);
-    const JSONData = JSON.stringify(data);
+    let data = Math.round(Math.random() * 10);
+    let JSONData = JSON.stringify(data);
     client.write(JSONData);
     console.log('...sending data ' + JSONData);
 }, 1000)
