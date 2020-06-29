@@ -17,9 +17,38 @@ app.use(express.static('public'));
 
 // add routes
 app.get('/', (req, res) => {
+  return res.send(navbarPage + homePage + footerPage);
+});
+
+app.get('/dashboard', (req, res) => {
     return res.send(navbarPage + dashboardPage);
 });
 
+// session
+const session = require('express-session');
+
+// You need to copy the config.template.json file and fill out your own secret
+const config = require('./config/config.json');
+
+app.use(session({
+    secret: config.sessionSecret,
+    resave: false,
+    saveUninitialized: true
+}));
+
+const rateLimit = require('express-rate-limit');
+
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100 // limit each IP to 100 requests per windowMs
+});
+
+app.use(limiter);
+
+const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 8 // limit each IP to 8 requests per windowMs
+});
 
 // setup objection and knex
 const { Model } = require('objection');
@@ -31,6 +60,11 @@ const Sensor = require('./models/Sensor.js');
 const knex = Knex(knexFile.development);
 
 Model.knex(knex);
+
+const authRoute = require('./routes/auth.js');
+const usersRoute = require('./routes/users.js');
+app.use(authRoute);
+app.use(usersRoute);
 
 // socket.io
 io.on('connection', socket => {
@@ -44,49 +78,36 @@ const netServer = net.createServer((socket) => {
     // generate socket id and store it in db
     socket.id = shortid.generate();
     serial_no = socket.id;
+    let sens;
     try {
-        Sensor.query().insert({ serial_no }).then(serial_no => {
-            console.log(`client connected [id=${serial_no}]`);
-        })
+      Sensor.query()
+        .insert({ serial_no })
+        .then((sensor) => {
+          sens = sensor;
+          console.log(`client connected [id=${sensor.serial_no}]`);
+        });
     } catch (error) {
-        console.log('error inserting data');
+      console.log("error inserting data");
     }
     // get temperature data
-    socket.on('data', (incomingJSONData) => {
-        temperature = JSON.parse(incomingJSONData);
-        try {
-            // store data in db before sending to browser
-            Data.query().insert({ temperature }).then(data => {
-                console.log('Storing data...' + temperature);
-                console.log('sending data to browser...' + temperature);
-                io.emit('temperature', temperature);
-            })
-        } catch (error) {
-            console.error("Error inserting data.");
-        }  
+    socket.on("data", (incomingJSONData) => {
+      temperature = JSON.parse(incomingJSONData);
+      try {
+        // store data in db before sending to browser
+        Data.query()
+          .insert({ temperature, sensor_id: sens.id })
+          .then((data) => {
+            console.log("storing data..." + temperature);
+            console.log("sending data to browser..." + temperature);
+            io.emit("temperature", temperature);
+          });
+      } catch (error) {
+        console.error("Error inserting data.");
+      }
     });
-});
+  });
 
 
-
-/*
-let id = 0;
-// fetch data from db and send it to the browser to be rendered
-setInterval(() => {
-    if (id++) {
-        try {
-            Data.query().select('data.*').where({ 'id': id }).then((results) => {
-                const temperature = results[0].temperature;
-                console.log('sending data to browser...' + temperature);
-                io.emit('temperature', temperature);
-            });
-        } catch (error) {
-            console.log('error sending data to browser');
-        }
-    }
-}, 1000); */
-
-// session
 
 
 // server is listening for incoming connection from a sensor
@@ -94,7 +115,6 @@ const SENSOR_PORT = 8124;
 netServer.listen(SENSOR_PORT, 'localhost', () => {
     console.log('waiting for client...');
 });
-
 
 // start webserver
 server.listen(3000, (error) => {

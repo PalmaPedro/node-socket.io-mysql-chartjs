@@ -37,7 +37,7 @@
 
     socket.on('temperature', value => {
       const length = data.labels.length
-      if (length >= 50) {
+      if (length >= 20) {
         data.datasets[0].data.shift()
         data.labels.shift()
       }

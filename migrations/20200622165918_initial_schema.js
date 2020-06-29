@@ -15,8 +15,8 @@ exports.up = function(knex) {
             table.increments('id');
             table.string('serial_no').notNullable();
 
-            //table.integer('user_id').unsigned();
-            //table.foreign('user_id').references('users.id'); // foreign key
+            table.integer('user_id').unsigned();
+            table.foreign('user_id').references('users.id'); // foreign key
             
         })
         .createTable('data', (table) => {
