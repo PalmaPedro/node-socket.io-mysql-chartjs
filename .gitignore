@@ -1,9 +1,7 @@
-# Dependencie directories
 /node_modules
 
-# mysql credentials
+config/rdsCredentials.js
+
 mysqlCredentials.js
 
-rdsCredentials.js
-
-//config.json
+config.json
