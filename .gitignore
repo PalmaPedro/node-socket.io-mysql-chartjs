@@ -4,4 +4,6 @@
 # mysql credentials
 mysqlCredentials.js
 
+rdsCredentials.js
+
 config.json
