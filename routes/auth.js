@@ -5,6 +5,7 @@ const bcrypt = require('bcrypt');
 const saltRounds = 12;
 
 const fs = require('fs');
+const { user } = require('../config/mysqlCredentials.js');
 const navbarPage = fs.readFileSync("./public/navbar.html", "utf8")
 const signupPage = fs.readFileSync("./public/signup.html", "utf8");
 const loginPage = fs.readFileSync("./public/login.html", "utf8");
@@ -26,7 +27,7 @@ router.get('/login', goHome, (req, res) => {
 router.post("/login", async (req, res) => {
 
     const { username, password } = req.body;
-
+    
     if (username && password) {
         try {
             User.query().select('username').where({ 'username': username }).then( async userFound => {

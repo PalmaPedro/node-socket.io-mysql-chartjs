@@ -9,20 +9,13 @@ const shortid = require('shortid');
 const fs = require('fs');
 const navbarPage = fs.readFileSync("./public/navbar.html", "utf8");
 const dashboardPage = fs.readFileSync("./public/dashboard.html", "utf8");
+const footerPage = fs.readFileSync("./public/footer.html", "utf8");
+const homePage = fs.readFileSync("./public/home.html", "utf8");
 
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 app.use(express.static('public'));
-
-// add routes
-app.get('/', (req, res) => {
-  return res.send(navbarPage + homePage + footerPage);
-});
-
-app.get('/dashboard', (req, res) => {
-    return res.send(navbarPage + dashboardPage);
-});
 
 // session
 const session = require('express-session');
@@ -63,8 +56,21 @@ Model.knex(knex);
 
 const authRoute = require('./routes/auth.js');
 const usersRoute = require('./routes/users.js');
+const sensorsRoute = require('./routes/sensors.js');
+const dashboardsRoute = require('./routes/dashboards.js');
 app.use(authRoute);
 app.use(usersRoute);
+app.use(sensorsRoute);
+app.use(dashboardsRoute);
+
+// add routes
+app.get('/', (req, res) => {
+  return res.send(navbarPage + homePage + footerPage);
+});
+
+app.get('/dashboard', (req, res) => {
+    return res.send(navbarPage + dashboardPage);
+});
 
 // socket.io
 io.on('connection', socket => {
@@ -80,9 +86,7 @@ const netServer = net.createServer((socket) => {
     serial_no = socket.id;
     let sens;
     try {
-      Sensor.query()
-        .insert({ serial_no })
-        .then((sensor) => {
+      Sensor.query().insert({ serial_no }).then((sensor) => {
           sens = sensor;
           console.log(`client connected [id=${sensor.serial_no}]`);
         });
@@ -94,9 +98,7 @@ const netServer = net.createServer((socket) => {
       temperature = JSON.parse(incomingJSONData);
       try {
         // store data in db before sending to browser
-        Data.query()
-          .insert({ temperature, sensor_id: sens.id })
-          .then((data) => {
+        Data.query().insert({ temperature, sensor_id: sens.id }).then((data) => {
             console.log("storing data..." + temperature);
             console.log("sending data to browser..." + temperature);
             io.emit("temperature", temperature);
@@ -106,8 +108,6 @@ const netServer = net.createServer((socket) => {
       }
     });
   });
-
-
 
 
 // server is listening for incoming connection from a sensor

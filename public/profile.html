@@ -14,12 +14,13 @@
             </tr>
         </table>
         <h3>To have access to your device dashboard, please confirm your serial number.</h3>
-            <form metho="post" action="/profile">
+        <div>
+            <form method="post" action="/profile">
                 <label for="name">Serial number:</label>
-                <input type="text" id="serial" name="serial" required
-                    minlength="9" maxlength="9" size="10">
-                <input type="button" id="serial" value="Register">
+                <input type="text"  class="serial-field" placeholder="serial" id="serial" name="serial" required>
+                <input type="submit" id="btn-serial"></input>
             </form>
+        </div>
         <p>The device is not registered.</p>
     </div>
 </div>

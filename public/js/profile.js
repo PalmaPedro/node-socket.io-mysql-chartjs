@@ -1,7 +1,7 @@
 //console.log('test');
 
-$(document).ready(function () {
-    $.get("/current-user/", function (details) {
+$(document).ready(() => {
+    $.get("/current-user/", (details) => {
         //console.log(data);
         $('#username').html(details.username),
             $('#email').html(details.email)

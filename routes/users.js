@@ -23,7 +23,7 @@ router.get('/current-user', requireLogin, (req, res) => {
 });
 
 router.get('/profile', requireLogin, (req, res) => {
-return res.send(navbarPage + profilePage);
+      return res.send(navbarPage + profilePage);
 });
 
 
