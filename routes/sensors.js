@@ -19,12 +19,14 @@ router.post('/profile',  (req, res) => {
                     // 2) By default a sensor has no user connected (null).it's waiting for a user to login to the application and register the device
                     // 3) i need to fetch the id of the user logged in 
                     User.query().select('id').where({ 'username': username }).then(userFound => {
-                        console.log(userFound);
+                        //console.log(userFound[0].id);
+                        const userId = userFound[0].id;
+                         // 4) update 'sensors' db table with the id of the user
+                       Sensor.query().patch({ 'user_id':  userId }).then(dbUpdated => {  // !!! THIS IS NOT WORKING
+                        return res.send({ response: "Device is registered!" });
                     });
-                    // 4) update 'sensors' db table with the id of the user
-                       /* Sensor.query().patch({ 'user_id':  ??? }).then(dbUpdated => {  // !!! THIS IS NOT WORKING
-                            return res.send({ response: "Device is registered!" });
-                        });*/
+                    });
+                   
                     
                 }
             });
