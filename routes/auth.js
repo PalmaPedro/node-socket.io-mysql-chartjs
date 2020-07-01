@@ -24,35 +24,41 @@ router.get('/login', goHome, (req, res) => {
     return res.send(navbarPage + loginPage);
 });
 
-router.post("/login", async (req, res) => {
+router.post("/login", (req, res) => {
 
     const { username, password } = req.body;
     
     if (username && password) {
         try {
-            User.query().select('username').where({ 'username': username }).then( async userFound => {
-                if (userFound.length == 0) {
+            User.query().select('username', 'password').where({ 'username': username }).then(foundUser => {
+                console.log(foundUser);
+                console.log(password);
+                console.log(foundUser[0].password);
+                if (foundUser.length == 0) {
                     return res.redirect("/login?error");
                 } else {
-                    const matchingPassword = await User.query().select('password').where({ 'username': username }).limit(1);
-                    const passwordToValidate = matchingPassword[0].password;
-
-                    bcrypt.compare(password, passwordToValidate).then((result) => {
-                        if (result) {
-                            req.session.loggedin = true;
-                            req.session.username = username;
-                            return res.redirect("/profile");
-                        } else {
-                            return res.redirect("login?error");
-                        }
-                    });
+                    // compare passwords
+                    try {
+                        bcrypt.compare(password, foundUser[0].password).then(result => {
+                            if (result) {
+                                // if passwords match, create session variables 
+                                req.session.loggedin = true;
+                                req.session.username = username;
+                                res.redirect('/profile');
+                            } else {
+                                return res.redirect("/login?error");
+                            }
+                        });
+                    } catch (error) {
+                        return res.redirect("/login?error");
+                    }
                 }
             });
         } catch (error) {
             return res.redirect("/login?error");
         }
     } else {
-        return res.redirect("/login?error");
+        return res.status(500).send({ response: "Something went wrong with the database." });
     }
 });
 
@@ -82,7 +88,7 @@ router.post('/signup', (req, res) => {
                               //return res.send({ response: `The user ${createdUser.username} was created` });
                               return res.redirect("/login");
                             });
-                          });
+                        });
                     }
                 });
             } catch (error) {
