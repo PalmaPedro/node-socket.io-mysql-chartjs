@@ -112,7 +112,7 @@ const netServer = net.createServer((socket) => {
 
 // server is listening for incoming connection from a sensor
 const SENSOR_PORT = 8124;
-netServer.listen(SENSOR_PORT, 'ec2-3-121-109-138.eu-central-1.compute.amazonaws.com', () => {
+netServer.listen(SENSOR_PORT, 'ec2-3-127-210-196.eu-central-1.compute.amazonaws.com', () => {
     console.log('waiting for client...');
 });
 
