@@ -23,7 +23,9 @@ router.post('/profile',  (req, res) => {
                         const userId = userFound[0].id;
                          // 4) update 'sensors' db table with the id of the user
                        Sensor.query().patch({ 'user_id':  userId }).where({ 'serial_no': serial }).then(dbUpdated => {  
-                        return res.send({ response: "Device is registered!" });
+                        //return res.send({ response: "Device is registered!" });
+                        return res.redirect("/profile");
+                        
                     });
                     });
                 }

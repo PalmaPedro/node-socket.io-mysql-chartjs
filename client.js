@@ -1,7 +1,7 @@
 const net = require('net');
 
 const client = new net.Socket();
-client.connect(8124,'localhost', () => {
+client.connect(8124,'ec2-3-127-210-196.eu-central-1.compute.amazonaws.com', () => {
     console.log('client connecting...');
 });
 
@@ -20,3 +20,4 @@ setInterval(() => {
     client.write(JSONData);
     console.log('...sending data ' + JSONData);
 }, 1000)
+

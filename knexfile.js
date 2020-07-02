@@ -1,5 +1,5 @@
-const credentials = require("./config/mysqlCredentials");
-//const credentials = require('./config/rdsCredentials.js');
+//const credentials = require("./config/mysqlCredentials");
+const credentials = require('./config/rdsCredentials.js');
 
 const { knexSnakeCaseMappers } = require('objection');
 

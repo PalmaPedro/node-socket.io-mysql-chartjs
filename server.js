@@ -68,10 +68,6 @@ app.get('/', (req, res) => {
   return res.send(navbarPage + homePage + footerPage);
 });
 
-app.get('/dashboard', (req, res) => {
-    return res.send(navbarPage + dashboardPage);
-});
-
 // socket.io
 io.on('connection', socket => {
     socket.on('temperature', value => {
@@ -80,13 +76,13 @@ io.on('connection', socket => {
 });
 
 // get incoming data, store it in db and send it to the browser
-const netServer = net.createServer((socket) => {
+const netServer = net.createServer(socket => {
     // generate socket id and store it in db
     socket.id = shortid.generate();
     serial_no = socket.id;
     let sens;
     try {
-      Sensor.query().insert({ serial_no }).then((sensor) => {
+      Sensor.query().insert({ serial_no }).then(sensor => {
           sens = sensor;
           console.log(`client connected [id=${sensor.serial_no}]`);
         });
@@ -94,11 +90,11 @@ const netServer = net.createServer((socket) => {
       console.log("error inserting data");
     }
     // get temperature data
-    socket.on("data", (incomingJSONData) => {
+    socket.on("data", incomingJSONData => {
       temperature = JSON.parse(incomingJSONData);
       try {
         // store data in db before sending to browser
-        Data.query().insert({ temperature, sensor_id: sens.id }).then((data) => {
+        Data.query().insert({ temperature, sensor_id: sens.id }).then(data => {
             console.log("storing data..." + temperature);
             console.log("sending data to browser..." + temperature);
             io.emit("temperature", temperature);
@@ -112,7 +108,7 @@ const netServer = net.createServer((socket) => {
 
 // server is listening for incoming connection from a sensor
 const SENSOR_PORT = 8124;
-netServer.listen(SENSOR_PORT, 'localhost', () => {
+netServer.listen(SENSOR_PORT, 'ec2-3-127-210-196.eu-central-1.compute.amazonaws.com', () => {
     console.log('waiting for client...');
 });
 
