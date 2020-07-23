@@ -1,7 +1,7 @@
 const net = require('net');
 
 const client = new net.Socket();
-client.connect(8124,'ec2-3-127-210-196.eu-central-1.compute.amazonaws.com', () => {
+client.connect(8124,'localhost', () => {
     console.log('client connecting...');
 });
 
